@@ -1,0 +1,13 @@
+openssh-server:
+file:
+less:
+kbd:
+curl:
+rsync:
+bash-completion:
+isc-dhcp-client:
+net-tools:
+cloud-init:
+cloud-utils:
+cloud-initramfs-growroot:
+locales-all:

@@ -1,0 +1,13 @@
+#!/bin/bash
+# Ensure we load the mellanox driver somehow
+
+if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
+    set -x
+fi
+set -eu
+set -o pipefail
+
+home=$(dirname $0)
+
+install -m 0644 -o root -g root $home/mellanox-rules.udev /etc/udev/rules.d/81-mellanox.rules
+echo "mlx4_en" >>/etc/modules

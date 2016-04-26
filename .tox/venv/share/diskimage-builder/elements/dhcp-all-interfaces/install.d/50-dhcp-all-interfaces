@@ -1,0 +1,22 @@
+#!/bin/bash
+
+if [ ${DIB_DEBUG_TRACE:-1} -gt 0 ]; then
+    set -x
+fi
+set -eu
+set -o pipefail
+
+SCRIPTDIR=$(dirname $0)
+
+install -D -g root -o root -m 0755 ${SCRIPTDIR}/dhcp-all-interfaces.sh /usr/local/sbin/dhcp-all-interfaces.sh
+
+DIB_INIT_SYSTEM=$(dib-init-system)
+if [ "$DIB_INIT_SYSTEM" == "upstart" ]; then
+    install -D -g root -o root -m 0755 ${SCRIPTDIR}/dhcp-all-interfaces.conf /etc/init/dhcp-all-interfaces.conf
+elif [ "$DIB_INIT_SYSTEM" == "systemd" ]; then
+    install -D -g root -o root -m 0755 ${SCRIPTDIR}/dhcp-interface@.service /usr/lib/systemd/system/dhcp-interface@.service
+    install -D -g root -o root -m 0644 ${SCRIPTDIR}/dhcp-all-interfaces-udev.rules /etc/udev/rules.d/99-dhcp-all-interfaces.rules
+elif [ "$DIB_INIT_SYSTEM" == "sysv" ]; then
+    install -D -g root -o root -m 0755 ${SCRIPTDIR}/dhcp-all-interfaces.init /etc/init.d/dhcp-all-interfaces
+    update-rc.d dhcp-all-interfaces defaults
+fi

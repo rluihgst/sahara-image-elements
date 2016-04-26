@@ -1,0 +1,33 @@
+actionid: venv
+msg: developpkg
+cmdargs: [local('/root/sahara-image-elements/.tox/venv/bin/pip'), 'install', '-U', '--no-deps', '-e', '/root/sahara-image-elements']
+env: {'LESSOPEN': '| /usr/bin/lesspipe %s', 'SSH_CLIENT': '192.168.201.51 57155 22', 'LOGNAME': 'root', 'USER': 'root', 'PATH': '/root/sahara-image-elements/.tox/venv/bin:/usr/lib/jvm/usr/lib/jvm/jdk1.7.0_75/bin:/usr/lib/jvm/usr/lib/jvm/jdk1.7.0_75/jre/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/opt/hadoop/bin/', 'HOME': '/root', 'LANG': 'en_US.UTF-8', 'TERM': 'xterm', 'SHELL': '/bin/bash', 'LANGUAGE': 'en_US:', 'SHLVL': '1', 'PYTHONHASHSEED': '266309399', 'LIBVIRT_DEFAULT_URI': 'qemu:///system', 'JAVA_HOME': '/usr/lib/jvm/jdk1.7.0_75/jre', 'XDG_RUNTIME_DIR': '/run/user/0', 'VIRTUAL_ENV': '/root/sahara-image-elements/.tox/venv', 'XDG_SESSION_ID': '564', '_': '/usr/local/bin/tox', 'LS_COLORS': 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arj=01;31:*.taz=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lz=01;31:*.xz=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.jpg=01;35:*.jpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.axv=01;35:*.anx=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.axa=00;36:*.oga=00;36:*.spx=00;36:*.xspf=00;36:', 'LESSCLOSE': '/usr/bin/lesspipe %s %s', 'SSH_TTY': '/dev/pts/12', 'OLDPWD': '/root/sahara-image-elements/elements', 'PWD': '/root/sahara-image-elements', 'MAIL': '/var/mail/root', 'SSH_CONNECTION': '192.168.201.51 57155 192.168.0.114 22'}
+
+Obtaining file:///root/sahara-image-elements
+  Running setup.py (path:/root/sahara-image-elements/setup.py) egg_info for package from file:///root/sahara-image-elements
+    [pbr] Processing SOURCES.txt
+    warning: LocalManifestMaker: standard file '-c' not found
+    
+    [pbr] In git context, generating filelist from git
+    warning: no files found matching 'AUTHORS'
+    warning: no files found matching 'ChangeLog'
+    warning: no previously-included files matching '*.pyc' found anywhere in distribution
+    warning: no files found matching 'README.md'
+Installing collected packages: sahara-image-elements
+  Running setup.py develop for sahara-image-elements
+    [pbr] Processing SOURCES.txt
+    warning: LocalManifestMaker: standard file '-c' not found
+    
+    [pbr] In git context, generating filelist from git
+    warning: no files found matching 'AUTHORS'
+    warning: no files found matching 'ChangeLog'
+    warning: no previously-included files matching '*.pyc' found anywhere in distribution
+    warning: no files found matching 'README.md'
+    Creating /root/sahara-image-elements/.tox/venv/lib/python2.7/site-packages/sahara-image-elements.egg-link (link to .)
+    sahara-image-elements 4.0.0.dev16 is already the active version in easy-install.pth
+    Installing sahara-image-create script to /root/sahara-image-elements/.tox/venv/bin
+    Installing diskimage-create.sh script to /root/sahara-image-elements/.tox/venv/bin
+    
+    Installed /root/sahara-image-elements
+Successfully installed sahara-image-elements
+Cleaning up...
