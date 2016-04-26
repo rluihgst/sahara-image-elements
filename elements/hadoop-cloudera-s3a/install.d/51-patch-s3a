@@ -1,0 +1,7 @@
+# *** ATTENTION ***
+# Change this to point to your HTTP server. You can use Python's HTTP server:
+#   "python -m SimpleHTTPServer 80" 
+# Make sure that your S3A_PATCH_DIR is in the same directory where you start 
+# the HTTP server. Open up a browser and go to S3A_PATCH_SERVER to verify that 
+# it's there.
+S3A_PATCH_SERVER=192.168.0.60:80

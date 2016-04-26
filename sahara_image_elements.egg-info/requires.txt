@@ -1,0 +1,3 @@
+pbr>=1.6
+dib-utils
+diskimage-builder>=1.1.2
