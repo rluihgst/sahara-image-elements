@@ -1,3 +1,23 @@
+#!/bin/bash
+
+if [ "${DIB_DEBUG_TRACE:-0}" -gt 0 ]; then
+    set -x
+fi
+set -eu
+set -o pipefail
+
+# Verify that we have patched JARs for this CDH version. 
+if [ $DIB_CDH_VERSION \< "5.4.5" ]; then
+  echo "Unsupported CDH version, accepted versions: 5.4.5"
+  exit -1
+fi
+
+# Skip patching if HDFS only image.
+if [ -n "${DIB_CDH_HDFS_ONLY:-}" ]; then
+  echo "No need to patch S3a on HDFS-only image."
+  exit
+fi
+
 # *** ATTENTION ***
 # Change this to point to your HTTP server. You can use Python's HTTP server:
 #   "python -m SimpleHTTPServer 80" 
@@ -5,3 +25,49 @@
 # the HTTP server. Open up a browser and go to S3A_PATCH_SERVER to verify that 
 # it's there.
 S3A_PATCH_SERVER=192.168.0.60:80
+
+# Patched Hadoop JARs repository, hardcoded for now.
+CDH_VERSION=5.4.5
+S3A_PATCH_DIR=s3a-jars-cdh-${CDH_VERSION}
+IMAGE_PATH=
+
+# Download patched JARs from a remote repository.
+S3A_PATCH_URL=http://${S3A_PATCH_SERVER}/${S3A_PATCH_DIR}
+cd /tmp
+wget -r -nH --no-parent --reject="index.html*" ${S3A_PATCH_URL}
+S3A_PATCH_PATH=/tmp/${S3A_PATCH_DIR}
+
+# Replace Hadoop JARs.
+cp -f ${S3A_PATCH_PATH}/share/hadoop/tools/lib/hadoop-aws-*-cdh${CDH_VERSION}.jar ${IMAGE_PATH}/usr/lib/hadoop/
+cp -f ${S3A_PATCH_PATH}/share/hadoop/tools/lib/hadoop-openstack-*-cdh${CDH_VERSION}.jar ${IMAGE_PATH}/usr/lib/hadoop/
+cp -f ${S3A_PATCH_PATH}/share/hadoop/common/hadoop-common-*-cdh${CDH_VERSION}.jar ${IMAGE_PATH}/usr/lib/sqoop2/client-lib/
+cp -f ${S3A_PATCH_PATH}/share/hadoop/common/hadoop-common-*-cdh${CDH_VERSION}.jar ${IMAGE_PATH}/usr/lib/hadoop/
+cp -f ${S3A_PATCH_PATH}/share/hadoop/mapreduce/hadoop-mapreduce-client-core-*-cdh${CDH_VERSION}.jar ${IMAGE_PATH}/usr/lib/hadoop-mapreduce/
+cp -f ${S3A_PATCH_PATH}/share/hadoop/mapreduce/hadoop-mapreduce-client-hs-*-cdh${CDH_VERSION}.jar ${IMAGE_PATH}/usr/lib/hadoop-mapreduce/
+cp -f ${S3A_PATCH_PATH}/share/hadoop/mapreduce/hadoop-mapreduce-client-jobclient-*-cdh${CDH_VERSION}-tests.jar ${IMAGE_PATH}/usr/lib/hadoop-mapreduce/
+
+# This is specific to Sahara's CDH file structure.
+cp -f ${S3A_PATCH_PATH}/share/hadoop/tools/lib/hadoop-openstack-*-cdh${CDH_VERSION}.jar ${IMAGE_PATH}/usr/lib/hadoop-mapreduce/hadoop-openstack.jar
+
+# Update Joda library.
+#cp -f ${S3A_PATCH_PATH}/share/hadoop/tools/lib/joda-time-*.jar ${CDH_PARCEL_PATH}/jars/
+
+# Replace AWS SDK.
+find ${IMAGE_PATH}/usr/lib -name 'aws-java-sdk*.jar' -delete
+cp -f ${S3A_PATCH_PATH}/share/hadoop/tools/lib/aws-java-sdk-*.jar ${IMAGE_PATH}/usr/lib/hadoop/lib/
+cp -f ${S3A_PATCH_PATH}/share/hadoop/tools/lib/aws-java-sdk-*.jar ${IMAGE_PATH}/usr/lib/impala/lib/
+cp -f ${S3A_PATCH_PATH}/share/hadoop/tools/lib/aws-java-sdk-*.jar ${IMAGE_PATH}/usr/lib/oozie/libtools/
+cp -f ${S3A_PATCH_PATH}/share/hadoop/tools/lib/aws-java-sdk-*.jar ${IMAGE_PATH}/usr/lib/parquet/lib/
+
+# Update all links to AWS SDK.
+cd ${IMAGE_PATH}/usr/lib/hadoop/client-0.20
+for f in $(ls ../lib/aws-java-sdk-*.jar); do
+  ln -s $f
+done
+cd ${IMAGE_PATH}/usr/lib/hadoop/client/
+for f in $(ls ../lib/aws-java-sdk-*.jar); do
+  ln -s $f
+done
+
+# Cleanup downloads.
+rm -rf ${S3A_PATCH_PATH}

@@ -1,0 +1,39 @@
+#!/bin/bash
+
+if [ "${DIB_DEBUG_TRACE:-0}" -gt 0 ]; then
+    set -x
+fi
+set -eu
+set -o pipefail
+
+# Verify that we have patched JARs for this CDH version. 
+if [ $DIB_HADOOP_VERSION \< "2.7.1" ]; then
+  echo "Unsupported Hadoop version, accepted versions: 2.7.1."
+  exit -1
+fi
+
+# *** ATTENTION ***
+# Change this to point to your HTTP server. You can use Python's HTTP server:
+#   "python -m SimpleHTTPServer 80" 
+# Make sure that your S3A_PATCH_DIR is in the same directory where you start 
+# the HTTP server. Open up a browser and go to S3A_PATCH_SERVER to verify that 
+# it's there.
+S3A_PATCH_SERVER=192.168.0.60:80
+
+# Patched Hadoop JARs repository, hardcoded for now.
+HADOOP_VERSION=2.7.1
+S3A_PATCH_DIR=s3a-jars-vanilla-${HADOOP_VERSION}
+IMAGE_PATH=
+
+# Download patched JARs from a remote repository.
+S3A_PATCH_URL=http://${S3A_PATCH_SERVER}/${S3A_PATCH_DIR}
+cd /tmp
+wget -r -nH --no-parent --reject="index.html*" ${S3A_PATCH_URL}
+S3A_PATCH_PATH=/tmp/${S3A_PATCH_DIR}
+
+# Replace Hadoop JARs.
+find ${IMAGE_PATH}/opt/hadoop-${HADOOP_VERSION}/ -name 'aws-java-sdk*.jar' -delete
+cp -f -R ${S3A_PATCH_PATH} ${IMAGE_PATH}/opt/hadoop-${HADOOP_VERSION}/
+
+# Cleanup downloads.
+rm -rf ${S3A_PATCH_PATH}

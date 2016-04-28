@@ -1,0 +1,65 @@
+#!/bin/bash
+
+if [ "${DIB_DEBUG_TRACE:-0}" -gt 0 ]; then
+    set -x
+fi
+set -eu
+set -o pipefail
+
+# Skip this step if not enabled.
+if [ $DIB_BOOTSTRAP_PEREGRINE \== "0" ]; then
+  exit
+fi
+
+# Verify that the target OS is supported by Peregrine.
+if [ $DISTRO_NAME \!= "ubuntu" ]; then
+  echo "Unsupported OS version, accepted versions: ubuntu."
+  exit -1
+fi
+
+echo "Bootstrapping image for Peregrine."
+
+sudo apt-get update
+sudo apt-get -y install gcc
+sudo apt-get -y install g++
+sudo apt-get -y install gfortran
+sudo apt-get -y install python-dev
+sudo apt-get -y install python-numpy
+sudo apt-get -y install python-scipy
+sudo apt-get -y install libmysqlclient-dev
+sudo apt-get -y install zlib1g-dev
+sudo apt-get -y install libxml2-dev
+sudo apt-get -y install libxslt-dev
+sudo apt-get -y install libsasl2-2
+sudo apt-get -y install libsasl2-dev
+sudo apt-get -y install libffi-dev
+sudo apt-get -y install libssl-dev
+sudo apt-get -y install liblapack-dev
+sudo apt-get -y install r-base
+sudo apt-get -y install r-base-dev
+sudo apt-get -y install libreadline-dev
+sudo apt-get -y install libquadmath0
+sudo apt-get -y install collectl
+sudo apt-get -y install python-pip
+sudo pip install -U setuptools
+sudo pip install argparse
+sudo pip install mrjob==0.4.4
+sudo pip install MySQL-python
+sudo pip install SQLAlchemy==1.0.3
+sudo pip install boto
+sudo pip install requests==2.6.2
+sudo pip install pyhs2==0.6.0
+sudo pip install pytz==2015.2
+sudo pip install lxml==3.4.4
+sudo pip install pyrrd==0.1.0
+sudo pip install rpy2==2.5.6
+sudo pip install numpy==1.9.2
+sudo pip install scipy==0.15.1
+sudo pip install pandas==0.16.0
+sudo pip install statsmodels==0.6.1
+sudo pip install ujson==1.33
+sudo pip install awsebcli==3.4.4
+sudo pip install impyla==0.10.0
+sudo pip install geopy==1.11.0
+#sudo /usr/bin/pip-2.6 install statsmodels==0.6.1
+#sudo /usr/bin/pip-2.6 install SQLAlchemy==1.0.3

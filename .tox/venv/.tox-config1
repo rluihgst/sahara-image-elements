@@ -1,4 +1,4 @@
 00000000000000000000000000000000 /usr/bin/python
-2.2.1 0 1
-00000000000000000000000000000000 -r/root/sahara-image-elements/requirements.txt
-00000000000000000000000000000000 -r/root/sahara-image-elements/test-requirements.txt
+1.6.0 0 0 1
+00000000000000000000000000000000 -r/root/rlui/sahara-image-elements/requirements.txt
+00000000000000000000000000000000 -r/root/rlui/sahara-image-elements/test-requirements.txt

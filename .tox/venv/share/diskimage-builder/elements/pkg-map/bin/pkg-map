@@ -33,6 +33,8 @@ def os_family(distro):
         family = 'debian'
     elif distro == 'opensuse':
         family = 'suse'
+    elif distro == 'gentoo':
+        family = 'gentoo'
 
     return family
 
@@ -63,7 +65,7 @@ def main():
 
     map_file = '/usr/share/pkg-map/%s' % args.element
     if not os.path.exists(map_file):
-        if os.environ.get('DIB_DEBUG_TRACE') != '0':
+        if os.environ.get('DIB_DEBUG_TRACE', '0') != '0':
             eprint('Map file for %s element does not exist.' % args.element)
         if args.missing_ok:
             for name in extra:
@@ -72,7 +74,11 @@ def main():
         sys.exit(2)
 
     with open(map_file) as fd:
-        package_names = json.loads(fd.read())
+        try:
+            package_names = json.loads(fd.read())
+        except ValueError:
+            eprint('Unable to parse %s' % map_file)
+            raise
 
     # Parse mapping data in this form using distro/family/default
     # Most specific takes priority (distro is most specific).

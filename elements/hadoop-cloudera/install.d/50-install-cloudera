@@ -72,8 +72,7 @@ case "$DIB_CDH_VERSION" in
         wget -O $dest $HADOOP_OPENSTACK_5_4_0_URL
 	;;
     5.4.5)
-        wget -O $dest $HADOOP_OPENSTACK_5_4_0_URL
-
+        wget -O $dest $HADOOP_OPENSTACK_5_4_5_URL
         # Create links to keep backward version support.
         ln -s /usr/lib/oozie/oozie-sharelib-yarn /usr/lib/oozie/oozie-sharelib-yarn.tar.gz
         ln -s /usr/lib/oozie/oozie-sharelib-mr1 /usr/lib/oozie/oozie-sharelib-mr1.tar.gz

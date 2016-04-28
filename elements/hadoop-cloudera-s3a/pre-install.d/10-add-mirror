@@ -172,7 +172,6 @@ function add_repo_5_4_5 {
     esac
 }
 
-
 # Call version-specific script to install the desired version of CDH
 case "$DIB_CDH_VERSION" in
     5.0)

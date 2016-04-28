@@ -1,0 +1,67 @@
+actionid=pep8
+msg=getenv
+cmdargs=[local('/root/sahara-image-elements/.tox/pep8/bin/pip'), 'install', '-U', '-r/root/sahara-image-elements/requirements.txt', '-r/root/sahara-image-elements/test-requirements.txt']
+env={'PYTHONIOENCODING': 'utf_8', 'LESSOPEN': '| /usr/bin/lesspipe %s', 'SSH_CLIENT': '192.168.0.114 38418 22', 'LOGNAME': 'root', 'USER': 'root', 'PATH': '/root/sahara-image-elements/.tox/pep8/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games', 'HOME': '/root/sahara-image-elements/.tox/pep8/tmp/pseudo-home', 'LANG': 'en_US.UTF-8', 'TERM': 'xterm-256color', 'SHELL': '/bin/bash', 'LANGUAGE': 'en_US:', 'SHLVL': '1', 'LIBVIRT_DEFAULT_URI': 'qemu:///system', 'XDG_RUNTIME_DIR': '/run/user/0', 'VIRTUAL_ENV': '/root/sahara-image-elements/.tox/pep8', 'XDG_SESSION_ID': '39', '_': '/usr/bin/tox', 'SSH_CONNECTION': '192.168.0.114 38418 192.168.0.60 22', 'LESSCLOSE': '/usr/bin/lesspipe %s %s', 'SSH_TTY': '/dev/pts/1', 'OLDPWD': '/root', 'PWD': '/root/sahara-image-elements', 'MAIL': '/var/mail/root', 'LS_COLORS': 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arj=01;31:*.taz=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lz=01;31:*.xz=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.jpg=01;35:*.jpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.axv=01;35:*.anx=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.axa=00;36:*.oga=00;36:*.spx=00;36:*.xspf=00;36:'}
+Downloading/unpacking pbr>=1.6 (from -r /root/sahara-image-elements/requirements.txt (line 5))
+Downloading/unpacking dib-utils (from -r /root/sahara-image-elements/requirements.txt (line 7))
+  Downloading dib-utils-0.0.8.tar.gz
+  Running setup.py (path:/root/sahara-image-elements/.tox/pep8/build/dib-utils/setup.py) egg_info for package dib-utils
+    
+    Installed /root/sahara-image-elements/.tox/pep8/build/dib-utils/pbr-1.8.1-py2.7.egg
+    [pbr] Processing SOURCES.txt
+    warning: LocalManifestMaker: standard file '-c' not found
+    
+    [pbr] In git context, generating filelist from git
+    warning: no previously-included files matching '*.pyc' found anywhere in distribution
+Downloading/unpacking diskimage-builder>=1.1.2 (from -r /root/sahara-image-elements/requirements.txt (line 8))
+Downloading/unpacking bashate>=0.2 (from -r /root/sahara-image-elements/test-requirements.txt (line 5))
+  Downloading bashate-0.3.2-py2-none-any.whl
+Downloading/unpacking hacking>=0.10.0,<0.11 (from -r /root/sahara-image-elements/test-requirements.txt (line 6))
+  Downloading hacking-0.10.2-py2.py3-none-any.whl
+Downloading/unpacking flake8>=2.2.4,<=2.4.1 (from diskimage-builder>=1.1.2->-r /root/sahara-image-elements/requirements.txt (line 8))
+  Downloading flake8-2.4.1-py2.py3-none-any.whl
+Downloading/unpacking six>=1.9.0 (from diskimage-builder>=1.1.2->-r /root/sahara-image-elements/requirements.txt (line 8))
+  Downloading six-1.10.0-py2.py3-none-any.whl
+Downloading/unpacking Babel>=1.3 (from diskimage-builder>=1.1.2->-r /root/sahara-image-elements/requirements.txt (line 8))
+Downloading/unpacking PyYAML>=3.1.0 (from diskimage-builder>=1.1.2->-r /root/sahara-image-elements/requirements.txt (line 8))
+  Running setup.py (path:/root/sahara-image-elements/.tox/pep8/build/PyYAML/setup.py) egg_info for package PyYAML
+    
+Downloading/unpacking argparse from https://pypi.python.org/packages/2.7/a/argparse/argparse-1.4.0-py2.py3-none-any.whl#md5=c37216a954c8669054e2b2c54853dd49 (from diskimage-builder>=1.1.2->-r /root/sahara-image-elements/requirements.txt (line 8))
+  Downloading argparse-1.4.0-py2.py3-none-any.whl
+Downloading/unpacking pep8==1.5.7 (from hacking>=0.10.0,<0.11->-r /root/sahara-image-elements/test-requirements.txt (line 6))
+  Downloading pep8-1.5.7-py2.py3-none-any.whl
+Downloading/unpacking pyflakes==0.8.1 (from hacking>=0.10.0,<0.11->-r /root/sahara-image-elements/test-requirements.txt (line 6))
+  Downloading pyflakes-0.8.1-py2.py3-none-any.whl
+Downloading/unpacking mccabe==0.2.1 (from hacking>=0.10.0,<0.11->-r /root/sahara-image-elements/test-requirements.txt (line 6))
+  Downloading mccabe-0.2.1.tar.gz
+  Running setup.py (path:/root/sahara-image-elements/.tox/pep8/build/mccabe/setup.py) egg_info for package mccabe
+    
+Downloading/unpacking pytz>=0a (from Babel>=1.3->diskimage-builder>=1.1.2->-r /root/sahara-image-elements/requirements.txt (line 8))
+Installing collected packages: pbr, dib-utils, diskimage-builder, bashate, hacking, flake8, six, Babel, PyYAML, argparse, pep8, pyflakes, mccabe, pytz
+  Running setup.py install for dib-utils
+    [pbr] Writing ChangeLog
+    [pbr] Generating ChangeLog
+    [pbr] ChangeLog complete (0.0s)
+    [pbr] Generating AUTHORS
+    [pbr] AUTHORS complete (0.0s)
+    [pbr] Reusing existing SOURCES.txt
+    changing mode of /root/sahara-image-elements/.tox/pep8/bin/dib-run-parts to 755
+  Running setup.py install for PyYAML
+    checking if libyaml is compilable
+    x86_64-linux-gnu-gcc -pthread -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -fPIC -I/usr/include/python2.7 -c build/temp.linux-x86_64-2.7/check_libyaml.c -o build/temp.linux-x86_64-2.7/check_libyaml.o
+    build/temp.linux-x86_64-2.7/check_libyaml.c:2:18: fatal error: yaml.h: No such file or directory
+     #include <yaml.h>
+                      ^
+    compilation terminated.
+    
+    libyaml is not found or a compiler error: forcing --without-libyaml
+    (if libyaml is installed correctly, you may need to
+     specify the option --include-dirs or uncomment and
+     modify the parameter include_dirs in setup.cfg)
+    
+  Found existing installation: argparse 1.2.1
+    Not uninstalling argparse at /usr/lib/python2.7, outside environment /root/sahara-image-elements/.tox/pep8
+  Running setup.py install for mccabe
+    
+Successfully installed pbr dib-utils diskimage-builder bashate hacking flake8 six Babel PyYAML argparse pep8 pyflakes mccabe pytz
+Cleaning up...

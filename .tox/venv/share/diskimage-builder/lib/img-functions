@@ -29,6 +29,17 @@ function unmount_image () {
     fi
 }
 
+function fstrim_image () {
+    # A race condition can occur when trying to fstrim immediately after
+    # deleting a file resulting in that free space not being reclaimed.
+    # Calling sync before fstrim is a workaround for this behaviour.
+    # https://lists.gnu.org/archive/html/qemu-devel/2014-03/msg02978.html
+    sync
+
+    # Discard all unused bytes
+    sudo fstrim "${TMP_BUILD_DIR}/mnt"
+}
+
 function trap_cleanup() {
     exitval=$?
     cleanup
@@ -191,6 +202,9 @@ function select_boot_kernel_initrd () {
     elif [ -f $TARGET_ROOT/etc/SuSE-release ]; then
         KERNEL=$(basename $(readlink -e $BOOTDIR/vmlinuz))
         RAMDISK=$(basename $(readlink -e $BOOTDIR/initrd))
+    elif [[ -f "${TARGET_ROOT}"/etc/gentoo-release ]]; then
+        KERNEL="$(basename $(ls -1rv $BOOTDIR/kernel-*-openstack | head -n 1))"
+        RAMDISK="$(basename $(ls -1rv $BOOTDIR/initramfs-*-openstack | head -n 1))"
     else
         echo "ERROR: Unable to detect operating system"
         exit 1

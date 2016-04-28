@@ -9,11 +9,20 @@ unset DIB_IMAGE_SIZE
 # DEBUG_MODE is set by the -d flag, debug is enabled if the value is "true"
 DEBUG_MODE="false"
 
+# The default version for Cloudera plugin
+DIB_DEFAULT_CDH_VERSION="5.3"
+
 # The default version for a MapR plugin
 DIB_DEFAULT_MAPR_VERSION="5.0.0"
 
 # The default version for Spark plugin
 DIB_DEFAULT_SPARK_VERSION="1.3.1"
+
+# Patch Hadoop core with the latest S3A support, Required to connecto to HGST AA.
+DIB_APPLY_S3A_PATCH=0
+
+# Bootstrap image with additional libraries required for Peregrine.
+DIB_BOOTSTRAP_PEREGRINE=0
 
 # Default list of datasource modules for ubuntu. Workaround for bug #1375645
 export CLOUD_INIT_DATASOURCES=${DIB_CLOUD_INIT_DATASOURCES:-"NoCloud, ConfigDrive, OVF, MAAS, Ec2"}
@@ -24,7 +33,7 @@ TRACING=
 usage() {
     echo
     echo "Usage: $(basename $0)"
-    echo "         [-p vanilla|spark|hdp|cloudera|cloudera-s3a|storm|mapr|plain]"
+    echo "         [-p vanilla|vanilla-s3a|vanilla-peregrine|spark|hdp|cloudera|cloudera-s3a|storm|mapr|plain]"
     echo "         [-i ubuntu|fedora|centos|centos7]"
     echo "         [-v 2|2.6|2.7.1|4|5.0|5.3|5.4|5.4.5]"
     echo "         [-r 3.1.1|4.0.1|4.0.2|5.0.0]"
@@ -150,7 +159,24 @@ case "$PLUGIN" in
             ;;
         esac
         ;;
-    "cloudera")
+    "vanilla-peregrine");;
+    "vanilla-s3a")
+        case "$HADOOP_VERSION" in
+            "" | "2.7.1");;
+            *)
+                echo -e "Unknown or unsupported hadoop version selected.\nAborting"
+                exit 1
+            ;;
+        esac
+        case "$BASE_IMAGE_OS" in
+            "" | "ubuntu" | "fedora" | "centos" | "centos7");;
+            *)
+                echo -e "'$BASE_IMAGE_OS' image type is not supported by '$PLUGIN'.\nAborting"
+                exit 1
+            ;;
+        esac
+        ;;
+     "cloudera")
         case "$BASE_IMAGE_OS" in
             "" | "ubuntu" | "centos");;
             *)
@@ -179,7 +205,7 @@ case "$PLUGIN" in
         case "$HADOOP_VERSION" in
             "" | "5.4" | "5.4.5");;
             *)
-                echo -e "Unknown hadoop version selected.\nAborting"
+                echo -e "Unknown or unsupported hadoop version selected.\nAborting"
                 exit 1
             ;;
         esac
@@ -196,8 +222,8 @@ case "$PLUGIN" in
         case "$HADOOP_VERSION" in
             "")
                 echo "CDH version not specified"
-                echo "CDH version 5.3 will be used"
-                HADOOP_VERSION="5.3"
+                echo "CDH version $DIB_DEFAULT_CDH_VERSION will be used"
+                HADOOP_VERSION=$DIB_DEFAULT_CDH_VERSION
             ;;
             "4")
                 HADOOP_VERSION="CDH4"
@@ -450,13 +476,26 @@ image_create() {
 # Images for Vanilla plugin #
 #############################
 
-if [ -z "$PLUGIN" -o "$PLUGIN" = "vanilla" ]; then
+if [ -z "$PLUGIN" -o "$PLUGIN" = "vanilla" -o "$PLUGIN" = "vanilla-s3a" -o "$PLUGIN" = "vanilla-peregrine" ]; then
     export OOZIE_HADOOP_V2_6_DOWNLOAD_URL=${OOZIE_HADOOP_V2_6_DOWNLOAD_URL:-"http://sahara-files.mirantis.com/oozie-4.0.1-hadoop-2.6.0.tar.gz"}
     export HADOOP_V2_6_NATIVE_LIBS_DOWNLOAD_URL=${HADOOP_V2_6_NATIVE_LIBS_DOWNLOAD_URL:-"http://sahara-files.mirantis.com/hadoop-native-libs-2.6.0.tar.gz"}
     export HIVE_VERSION=${HIVE_VERSION:-"0.11.0"}
     export HADOOP_V2_7_1_NATIVE_LIBS_DOWNLOAD_URL=${HADOOP_V2_7_1_NATIVE_LIBS_DOWNLOAD_URL:-"http://sahara-files.mirantis.com/hadoop-native-libs-2.7.1.tar.gz"}
     export OOZIE_HADOOP_V2_7_1_DOWNLOAD_URL=${OOZIE_HADOOP_V2_7_1_FILE:-"http://sahara-files.mirantis.com/oozie-4.2.0-hadoop-2.7.1.tar.gz"}
 
+    if [ "$PLUGIN" = "vanilla-s3a" ]; then
+        export DIB_APPLY_S3A_PATCH=1
+        export DIB_BOOTSTRAP_PEREGRINE=0
+        image_name="hadoop_s3a"
+    elif [ "$PLUGIN" = "vanilla-peregrine" ]; then
+        export DIB_APPLY_S3A_PATCH=1
+        export DIB_BOOTSTRAP_PEREGRINE=1
+        image_name="hadoop_s3a_peregrine"
+    else
+         export DIB_APPLY_S3A_PATCH=0
+        export DIB_BOOTSTRAP_PEREGRINE=0
+        image_name="hadoop"
+    fi
     ubuntu_elements_sequence="hadoop oozie mysql hive $JAVA_ELEMENT"
     fedora_elements_sequence="hadoop oozie mysql disable-firewall hive $JAVA_ELEMENT"
     centos_elements_sequence="hadoop oozie mysql disable-firewall hive $JAVA_ELEMENT"
@@ -482,12 +521,12 @@ if [ -z "$PLUGIN" -o "$PLUGIN" = "vanilla" ]; then
 
         if [ -z "$HADOOP_VERSION" -o "$HADOOP_VERSION" = "2.6" ]; then
             export DIB_HADOOP_VERSION=${DIB_HADOOP_VERSION_2_6:-"2.6.0"}
-            export ubuntu_image_name=${ubuntu_vanilla_hadoop_2_6_image_name:-"ubuntu_sahara_vanilla_hadoop_2_6_latest"}
+            export ubuntu_image_name=${ubuntu_vanilla_hadoop_2_6_image_name:-"ubuntu_sahara_vanilla_${image_name}_2_6_latest"}
             image_create ubuntu $ubuntu_image_name $ubuntu_elements_sequence
         fi
         if [ -z "$HADOOP_VERSION" -o "$HADOOP_VERSION" = "2.7.1" ]; then
             export DIB_HADOOP_VERSION=${DIB_HADOOP_VERSION_2_7_1:-"2.7.1"}
-            export ubuntu_image_name=${ubuntu_vanilla_hadoop_2_7_1_image_name:-"ubuntu_sahara_vanilla_hadoop_2_7_1_latest"}
+            export ubuntu_image_name=${ubuntu_vanilla_hadoop_2_7_1_image_name:-"ubuntu_sahara_vanilla_${image_name}_2_7_1_latest"}
             image_create ubuntu $ubuntu_image_name $ubuntu_elements_sequence
         fi
         unset DIB_CLOUD_INIT_DATASOURCES
@@ -497,12 +536,12 @@ if [ -z "$PLUGIN" -o "$PLUGIN" = "vanilla" ]; then
     if [ -z "$BASE_IMAGE_OS" -o "$BASE_IMAGE_OS" = "fedora" ]; then
         if [ -z "$HADOOP_VERSION" -o "$HADOOP_VERSION" = "2.6" ]; then
             export DIB_HADOOP_VERSION=${DIB_HADOOP_VERSION_2_6:-"2.6.0"}
-            export fedora_image_name=${fedora_vanilla_hadoop_2_6_image_name:-"fedora_sahara_vanilla_hadoop_2_6_latest$suffix"}
+            export fedora_image_name=${fedora_vanilla_hadoop_2_6_image_name:-"fedora_sahara_vanilla_${image_name}_2_6_latest$suffix"}
             image_create fedora $fedora_image_name $fedora_elements_sequence
         fi
         if [ -z "$HADOOP_VERSION" -o "$HADOOP_VERSION" = "2.7.1" ]; then
             export DIB_HADOOP_VERSION=${DIB_HADOOP_VERSION_2_7_1:-"2.7.1"}
-            export fedora_image_name=${fedora_vanilla_hadoop_2_7_1_image_name:-"fedora_sahara_vanilla_hadoop_2_7_1_latest$suffix"}
+            export fedora_image_name=${fedora_vanilla_hadoop_2_7_1_image_name:-"fedora_sahara_vanilla_${image_name}_2_7_1_latest$suffix"}
             image_create fedora $fedora_image_name $fedora_elements_sequence
         fi
     fi
@@ -511,12 +550,12 @@ if [ -z "$PLUGIN" -o "$PLUGIN" = "vanilla" ]; then
     if [ -z "$BASE_IMAGE_OS" -o "$BASE_IMAGE_OS" = "centos" ]; then
         if [ -z "$HADOOP_VERSION" -o "$HADOOP_VERSION" = "2.6" ]; then
             export DIB_HADOOP_VERSION=${DIB_HADOOP_VERSION_2_6:-"2.6.0"}
-            export centos_image_name=${centos_vanilla_hadoop_2_6_image_name:-"centos_sahara_vanilla_hadoop_2_6_latest$suffix"}
+            export centos_image_name=${centos_vanilla_hadoop_2_6_image_name:-"centos_sahara_vanilla_${image_name}_2_6_latest$suffix"}
             image_create centos $centos_image_name $centos_elements_sequence
         fi
         if [ -z "$HADOOP_VERSION" -o "$HADOOP_VERSION" = "2.7.1" ]; then
             export DIB_HADOOP_VERSION=${DIB_HADOOP_VERSION_2_7_1:-"2.7.1"}
-            export centos_image_name=${centos_vanilla_hadoop_2_7_1_image_name:-"centos_sahara_vanilla_hadoop_2_7_1_latest$suffix"}
+            export centos_image_name=${centos_vanilla_hadoop_2_7_1_image_name:-"centos_sahara_vanilla_${image_name}_2_7_1_latest$suffix"}
             image_create centos $centos_image_name $centos_elements_sequence
         fi
     fi
@@ -525,12 +564,12 @@ if [ -z "$PLUGIN" -o "$PLUGIN" = "vanilla" ]; then
     if [ -z "$BASE_IMAGE_OS" -o "$BASE_IMAGE_OS" = "centos7" ]; then
         if [ -z "$HADOOP_VERSION" -o "$HADOOP_VERSION" = "2.6" ]; then
             export DIB_HADOOP_VERSION=${DIB_HADOOP_VERSION_2_6:-"2.6.0"}
-            export centos7_image_name=${centos7_vanilla_hadoop_2_6_image_name:-"centos7_sahara_vanilla_hadoop_2_6_latest$suffix"}
+            export centos7_image_name=${centos7_vanilla_hadoop_2_6_image_name:-"centos7_sahara_vanilla_${image_name}_2_6_latest$suffix"}
             image_create centos7 $centos7_image_name $centos7_elements_sequence
         fi
         if [ -z "$HADOOP_VERSION" -o "$HADOOP_VERSION" = "2.7.1" ]; then
             export DIB_HADOOP_VERSION=${DIB_HADOOP_VERSION_2_7_1:-"2.7.1"}
-            export centos7_image_name=${centos7_vanilla_hadoop_2_7_1_image_name:-"centos7_sahara_vanilla_hadoop_2_7_1_latest$suffix"}
+            export centos7_image_name=${centos7_vanilla_hadoop_2_7_1_image_name:-"centos7_sahara_vanilla_${image_name}_2_7_1_latest$suffix"}
             image_create centos7 $centos7_image_name $centos7_elements_sequence
         fi
     fi
@@ -551,7 +590,7 @@ if [ -z "$PLUGIN" -o "$PLUGIN" = "spark" ]; then
         export DIB_CDH_VERSION="CDH4"
         ubuntu_elements_sequence="$COMMON_ELEMENTS hadoop-cdh"
     else
-        export DIB_CDH_VERSION=${HADOOP_VERSION:-"5.3"}
+        export DIB_CDH_VERSION=${HADOOP_VERSION:-$DIB_DEFAULT_CDH_VERSION}
         ubuntu_elements_sequence="$COMMON_ELEMENTS hadoop-cloudera"
     fi
 
@@ -733,7 +772,7 @@ if [ -z "$PLUGIN" -o "$PLUGIN" = "cloudera" ]; then
         if [ -z "$HADOOP_VERSION" -o "$HADOOP_VERSION" = "5.4.5" ]; then
             export DIB_CDH_VERSION="5.4.5"
 
-            cloudera_5_4_centos_image_name=${cloudera_5_4_5_centos_image_name:-centos_sahara_cloudera_5_4_5}
+            cloudera_5_4_5_centos_image_name=${cloudera_5_4_5_centos_image_name:-centos_sahara_cloudera_5_4_5}
             cloudera_elements_sequence="hadoop-cloudera selinux-permissive disable-firewall"
 
             image_create centos $cloudera_5_4_5_centos_image_name $cloudera_elements_sequence
@@ -763,8 +802,10 @@ if [ -z "$PLUGIN" -o "$PLUGIN" = "cloudera-s3a" ]; then
             image_create ubuntu $cloudera_5_4_ubuntu_image_name $cloudera_elements_sequence
             unset DIB_CDH_VERSION DIB_RELEASE
         fi
+    fi
+    if [ -z "$BASE_IMAGE_OS" -o "$BASE_IMAGE_OS" = "ubuntu" ]; then
         if [ -z "$HADOOP_VERSION" -o "$HADOOP_VERSION" = "5.4.5" ]; then
-            cloudera_5_4_ubuntu_image_name=${cloudera_5_4_5_ubuntu_image_name:-ubuntu_sahara_cloudera_s3a_5_4_5}
+            cloudera_5_4_5_ubuntu_image_name=${cloudera_5_4_5_ubuntu_image_name:-ubuntu_sahara_cloudera_s3a_5_4_5}
             cloudera_elements_sequence="hadoop-cloudera-s3a"
 
             # Cloudera supports only 12.04 Ubuntu
@@ -784,8 +825,10 @@ if [ -z "$PLUGIN" -o "$PLUGIN" = "cloudera-s3a" ]; then
             image_create centos $cloudera_5_4_centos_image_name $cloudera_elements_sequence
             unset DIB_CDH_VERSION
         fi
+    fi
+    if [ -z "$BASE_IMAGE_OS" -o "$BASE_IMAGE_OS" = "centos" ]; then
         if [ -z "$HADOOP_VERSION" -o "$HADOOP_VERSION" = "5.4.5" ]; then
-            cloudera_5_4_centos_image_name=${cloudera_5_4_5_centos_image_name:-centos_sahara_cloudera_s3a_5_4_5}
+            cloudera_5_4_5_centos_image_name=${cloudera_5_4_5_centos_image_name:-centos_sahara_cloudera_s3a_5_4_5}
             cloudera_elements_sequence="hadoop-cloudera-s3a selinux-permissive disable-firewall"
 
             export DIB_CDH_VERSION="5.4.5"

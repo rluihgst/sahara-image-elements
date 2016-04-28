@@ -56,7 +56,15 @@ function config_exists() {
             return 0
         fi
     else
-        ifquery $interface >/dev/null 2>&1 && return 0 || return 1
+        if ifquery $interface >/dev/null 2>&1; then
+            if [ -z "$(ifquery $interface 2>&1)" ]; then
+                return 1
+            else
+                return 0
+            fi
+        else
+            return 1
+        fi
     fi
     return 1
 }
@@ -76,7 +84,7 @@ function inspect_interface() {
 
         local has_link
         local tries
-        for ((tries = 0; tries < 10; tries++)); do
+        for ((tries = 0; tries < 20; tries++)); do
             has_link=$(get_if_link $interface)
             [ "$has_link" == "1" ] && break
             sleep 1

@@ -102,7 +102,17 @@ elements/hadoop-mapr/resources/spec_4.0.2.json
 elements/hadoop-mapr/resources/spec_5.0.0.json
 elements/hadoop-mapr/resources/versions.py
 elements/hadoop-mapr/root.d/0-mapr-check-version
+elements/hadoop-s3a/README.rst
+elements/hadoop-s3a/element-deps
+elements/hadoop-s3a/package-installs.yaml
+elements/hadoop-s3a/install.d/40-setup-hadoop
+elements/hadoop-s3a/install.d/41-patch-s3a
+elements/hadoop-s3a/install.d/firstboot
+elements/hadoop-s3a/root.d/0-check-hadoop
+elements/hadoop-s3a/root.d/50-download-hadoop
 elements/hadoop/install.d/40-setup-hadoop
+elements/hadoop/install.d/41-patch-s3a
+elements/hadoop/install.d/42-bootstrap-peregrine
 elements/hadoop/install.d/firstboot
 elements/hadoop/root.d/0-check-hadoop
 elements/hadoop/root.d/50-download-hadoop

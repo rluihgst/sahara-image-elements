@@ -1,0 +1,60 @@
+#!/bin/bash
+
+if [ "${DIB_DEBUG_TRACE:-0}" -gt 0 ]; then
+    set -x
+fi
+set -eu
+set -o pipefail
+
+if [ $DIB_APPLY_S3A_PATCH \== "0" ]; then
+  exit
+fi
+
+# Verify that we have patched JARs for this CDH version. 
+if [ $DIB_HADOOP_VERSION \!= "2.7.1" ]; then
+  echo "Unsupported Hadoop version, accepted versions: 2.7.1."
+  exit -1
+fi
+
+# Target Hadoop version.
+HADOOP_VERSION=$DIB_HADOOP_VERSION
+HADOOP_PATH=/opt/hadoop-${HADOOP_VERSION}
+
+# *** ATTENTION ***
+# Change this to point to your HTTP server. You can use Python's HTTP server:
+#   "python -m SimpleHTTPServer 80" 
+# Make sure that your S3A_PATCH_DIR is in the same directory where you start 
+# the HTTP server. Open up a browser and go to S3A_PATCH_SERVER to verify that 
+# it's there.
+
+# Patched Hadoop JARs repository, hardcoded for now.
+S3A_PATCH_SERVER=192.168.0.60:80
+S3A_PATCH_DIR=s3a-jars-vanilla-${HADOOP_VERSION}
+S3A_PATCH_URL=http://${S3A_PATCH_SERVER}/${S3A_PATCH_DIR}
+
+echo "Downloading patched S3A JARs from ${S3A_PATCH_URL}"
+
+# Download patched JARs from a remote repository.
+cd /tmp
+mkdir ${S3A_PATCH_DIR} # !!! must create otherwise recursive download does not work !!!
+wget -r -l 10 -nH --no-parent --reject="index.html*" ${S3A_PATCH_URL}
+S3A_PATCH_PATH=/tmp/${S3A_PATCH_DIR}
+
+echo "Patching Hadoop files."
+
+# Delete previos versions of libraries.
+find ${HADOOP_PATH}/ -name 'aws-java-sdk*.jar' -delete
+
+# Replace Hadoop core libraries.
+cp -f -R ${S3A_PATCH_PATH}/* ${HADOOP_PATH}/
+
+# Fix missing S3A and AWS libraris in Hadoop classpath.
+cp -f ${HADOOP_PATH}/share/hadoop/tools/lib/hadoop-aws-*.jar ${HADOOP_PATH}/share/hadoop/common/lib/
+cp -f ${HADOOP_PATH}/share/hadoop/tools/lib/aws-java-sdk-*.jar ${HADOOP_PATH}/share/hadoop/common/lib/
+cp -f ${HADOOP_PATH}/share/hadoop/tools/lib/jackson-*.jar ${HADOOP_PATH}/share/hadoop/common/lib/
+cp -f ${HADOOP_PATH}/share/hadoop/tools/lib/joda-time-*.jar ${HADOOP_PATH}/share/hadoop/common/lib/
+
+# Cleanup downloads.
+rm -rf ${S3A_PATCH_PATH}
+
+echo "S3A patched succesfully."
